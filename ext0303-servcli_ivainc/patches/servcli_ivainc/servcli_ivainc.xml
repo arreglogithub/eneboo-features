@@ -1,0 +1,6 @@
+<flpatch:modifications xmlns:flpatch="http://www.abanqg2.com/es/directori/abanq-ensambla/?flpatch" name="servcli_ivainc">
+  <flpatch:patchXml name="lineasservicioscli.ui" path="facturacion/facturacion/forms/" style="legacy1"/>
+  <flpatch:patchScript name="masterservicioscli.qs" path="facturacion/facturacion/scripts/" style="legacy"/>
+  <flpatch:patchScript name="servicioscli.qs" path="facturacion/facturacion/scripts/" style="legacy"/>
+  <flpatch:patchXml name="lineasservicioscli.mtd" path="facturacion/facturacion/tables/" style="legacy1"/>
+</flpatch:modifications>

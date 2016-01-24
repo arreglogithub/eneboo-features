@@ -1,0 +1,3 @@
+<flpatch:modifications xmlns:flpatch="http://www.abanqg2.com/es/directori/abanq-ensambla/?flpatch" name="reportUnico">
+  <flpatch:patchScript name="flfactinfo.qs" path="facturacion/informes/scripts/" style="legacy"/>
+</flpatch:modifications>

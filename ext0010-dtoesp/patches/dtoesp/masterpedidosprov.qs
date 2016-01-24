@@ -90,6 +90,18 @@ function dtoEspecial_commonCalculateField(fN:String, cursor:FLSqlCursor):String
 			valor = parseFloat(util.roundFieldValue(valor, "pedidosprov", "pordtoesp"));
 			break;
 		}
+		/** \C
+		El --totalirpf-- es el producto del --irpf-- por el --neto--
+		\end */
+		case "totalirpf": {
+			valor = (util.sqlSelect("lineaspedidosprov", "SUM((pvptotal * irpf) / 100)", "idpedido = " + cursor.valueBuffer("idpedido")));
+			if (parseFloat(cursor.valueBuffer("pordtoesp")) != 0)
+			{
+			valor = valor - ( valor * parseFloat(cursor.valueBuffer("pordtoesp")) / 100);
+			}
+			valor = parseFloat(util.roundFieldValue(valor, "pedidosprov", "totalirpf"));
+			break;
+		}
 		default: {
 			valor = this.iface.__commonCalculateField(fN, cursor);
 			break;
@@ -156,7 +168,7 @@ function dtoEspecial_buscarPorDtoEsp(where:String):Number
 {
 	var util:FLUtil = new FLUtil;
 	var porDtoEsp:Number = util.sqlSelect("pedidosprov", "pordtoesp", where);
-	var porDtoEsp2:Number = util.sqlSelect("pedidosprov", "pordtoesp", where + "AND pordtoesp <> " + porDtoEsp);
+	var porDtoEsp2:Number = util.sqlSelect("pedidosprov", "pordtoesp", where + " AND pordtoesp <> " + porDtoEsp);
 	if (!porDtoEsp2 && isNaN(parseFloat(porDtoEsp2)))
 		return porDtoEsp;
 	else
