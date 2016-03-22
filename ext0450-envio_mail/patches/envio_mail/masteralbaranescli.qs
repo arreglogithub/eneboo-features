@@ -2,19 +2,16 @@
 /** @class_declaration envioMail */
 /////////////////////////////////////////////////////////////////
 //// ENVIO_MAIL ////////////////////////////////////////////////
-class envioMail extends oficial {
+class envioMail extends oficial /** %from: oficial */ {
     function envioMail( context ) { oficial ( context ); }
-	function init() { 
-		return this.ctx.envioMail_init(); 
+	function init() {
+		return this.ctx.envioMail_init();
 	}
 	function enviarDocumento(codAlbaran:String, codCliente:String) {
 		return this.ctx.envioMail_enviarDocumento(codAlbaran, codCliente);
 	}
 	function imprimir(codAlbaran:String) {
 		return this.ctx.envioMail_imprimir(codAlbaran);
-	}
-	function dameParamInformeMail(idAlbaran) {
-		return this.ctx.envioMail_dameParamInformeMail(idAlbaran);
 	}
 }
 
@@ -24,8 +21,8 @@ class envioMail extends oficial {
 /** @class_declaration pubEnvioMail */
 /////////////////////////////////////////////////////////////////
 //// PUB_ENVIO_MAIL /////////////////////////////////////////////
-class pubEnvioMail extends head {
-    function pubEnvioMail( context ) { head( context ); }
+class pubEnvioMail extends ifaceCtx /** %from: ifaceCtx */ {
+    function pubEnvioMail( context ) { ifaceCtx( context ); }
 	function pub_enviarDocumento(codAlbaran:String, codCliente:String) {
 		return this.enviarDocumento(codAlbaran, codCliente);
 	}
@@ -48,17 +45,7 @@ function envioMail_enviarDocumento(codAlbaran:String, codCliente:String)
 {
 	var cursor:FLSqlCursor = this.cursor();
 	var util:FLUtil = new FLUtil();
-	var usuario = sys.nameUser();
-	var usarSMTP;
-	
-	var clienteCorreo = AQUtil.readSettingEntry("scripts/flfactinfo/clientecorreo");
-	if (clienteCorreo == "Eneboo") {
-		usarSMTP = true;
-	}
-	else{
-		usarSMTP = AQUtil.sqlSelect("usuarios", "utilizarsmtp", "idusuario='" + usuario + "'");
-	}
-	
+
 	if (!codAlbaran) {
 		codAlbaran = cursor.valueBuffer("codigo");
 	}
@@ -82,65 +69,44 @@ function envioMail_enviarDocumento(codAlbaran:String, codCliente:String)
 	var rutaDocumento:String = rutaIntermedia + "A_" + codAlbaran + ".pdf";
 
 	var util:FLUtil = new FLUtil;
-	var codigo, idAlbaran;
+	var codigo:String;
 	if (codAlbaran) {
 		codigo = codAlbaran;
-		idAlbaran = util.sqlSelect("albaranescli", "idalbaran", "codigo = '" + codigo + "'");
 	} else {
 		if (!cursor.isValid()) {
 			return;
 		}
 		codigo = cursor.valueBuffer("codigo");
-		idAlbaran = cursor.valueBuffer("idalbaran");
 	}
-	
+
+	var numCopias:Number = util.sqlSelect("albaranescli a INNER JOIN clientes c ON c.codcliente = a.codcliente", "c.copiasfactura", "a.codigo = '" + codigo + "'", "albaranescli,clientes");
+	if (!numCopias) {
+		numCopias = 1;
+	}
+
 	var curImprimir:FLSqlCursor = new FLSqlCursor("i_albaranescli");
 	curImprimir.setModeAccess(curImprimir.Insert);
 	curImprimir.refreshBuffer();
 	curImprimir.setValueBuffer("descripcion", "temp");
 	curImprimir.setValueBuffer("d_albaranescli_codigo", codigo);
 	curImprimir.setValueBuffer("h_albaranescli_codigo", codigo);
-	var oParam = this.iface.dameParamInformeMail(idAlbaran);
-	var oDatosPdf = new Object();
-	oDatosPdf["pdf"] = true;
-	oDatosPdf["ruta"] = rutaDocumento;
-	oParam.datosPdf = oDatosPdf;
-	flfactinfo.iface.pub_lanzaInforme(curImprimir, oParam);
-	
-	if(!usarSMTP) {
-	     var arrayDest:Array = [];
-	     arrayDest[0] = [];
-	     arrayDest[0]["tipo"] = "to";
-	     arrayDest[0]["direccion"] = emailCliente;
+	flfactinfo.iface.pub_lanzarInforme(curImprimir, "i_albaranescli", "", "", false, false, "", "i_albaranescli", 1, rutaDocumento, true);
 
-	     var arrayAttach:Array = [];
-	     arrayAttach[0] = rutaDocumento;
+	var arrayDest:Array = [];
+	arrayDest[0] = [];
+	arrayDest[0]["tipo"] = "to";
+	arrayDest[0]["direccion"] = emailCliente;
 
-	     flfactppal.iface.pub_enviarCorreo(cuerpo, asunto, arrayDest, arrayAttach);
-	} else {
-	     var datosMail = [];
-	     datosMail["subject"] = asunto;
-	     datosMail["body"] = cuerpo;
-	     datosMail["from"] = AQUtil.sqlSelect("usuarios", "usuariosmtp", "idusuario='" + usuario + "'");
-	     datosMail["to"] = emailCliente;   	
-	     var arrayAttach = [];
-	     arrayAttach[0] = rutaDocumento;
-	     datosMail["attach"] = arrayAttach;
-	     flfacturac.iface.pub_enviarMail(datosMail);
-	     
-	}
-}
+	var arrayAttach:Array = [];
+	arrayAttach[0] = rutaDocumento;
 
-function envioMail_dameParamInformeMail(idAlbaran)
-{
-	var oParam = this.iface.dameParamInforme(idAlbaran);
-	return oParam;
+	flfactppal.iface.pub_enviarCorreo(cuerpo, asunto, arrayDest, arrayAttach);
 }
 
 function envioMail_imprimir(codAlbaran:String)
 {
 	var util:FLUtil = new FLUtil;
-	
+
 	var datosEMail:Array = [];
 	datosEMail["tipoInforme"] = "albaranescli";
 	var codCliente:String;
@@ -158,3 +124,4 @@ function envioMail_imprimir(codAlbaran:String)
 
 //// ENVIO_MAIL /////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////
+

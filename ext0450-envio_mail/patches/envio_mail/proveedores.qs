@@ -2,22 +2,22 @@
 /** @class_declaration envioMail */
 /////////////////////////////////////////////////////////////////
 //// ENVIO MAIL /////////////////////////////////////////////////
-class envioMail extends oficial {
+class envioMail extends oficial /** %from: oficial */ {
     function envioMail( context ) { oficial ( context ); }
-    function init() { 
-		return this.ctx.envioMail_init(); 
+    function init() {
+		return this.ctx.envioMail_init();
 	}
-    function enviarEmail() { 
-		return this.ctx.envioMail_enviarEmail(); 
+    function enviarEmail() {
+		return this.ctx.envioMail_enviarEmail();
 	}
-    function enviarEmailPedido() { 
-		return this.ctx.envioMail_enviarEmailPedido(); 
+    function enviarEmailPedido() {
+		return this.ctx.envioMail_enviarEmailPedido();
 	}
-    function accesoWeb():Boolean { 
-		return this.ctx.envioMail_accesoWeb(); 
+    function accesoWeb():Boolean {
+		return this.ctx.envioMail_accesoWeb();
 	}
-    function enviarEmailContacto() { 
-		return this.ctx.envioMail_enviarEmailContacto(); 
+    function enviarEmailContacto() {
+		return this.ctx.envioMail_enviarEmailContacto();
 	}
 }
 //// ENVIO MAIL /////////////////////////////////////////////////
@@ -40,16 +40,6 @@ function envioMail_enviarEmail()
 {
 	var cursor:FLSqlCursor = this.cursor();
 	var util:FLUtil = new FLUtil();
-	var usuario = sys.nameUser();
-	var usarSMTP;
-	
-	var clienteCorreo = AQUtil.readSettingEntry("scripts/flfactinfo/clientecorreo");
-	if (clienteCorreo == "Eneboo") {
-		usarSMTP = true;
-	}
-	else{
-		usarSMTP = AQUtil.sqlSelect("usuarios", "utilizarsmtp", "idusuario='" + usuario + "'");
-	}
 
 	var codProveedor:String = cursor.valueBuffer("codproveedor");
 	var tabla:String = "proveedores";
@@ -60,26 +50,15 @@ function envioMail_enviarEmail()
 
 	var cuerpo:String = "";
 	var asunto:String = "";
-	if(!usarSMTP) {
-		var arrayDest:Array = [];
-		arrayDest[0] = [];
-		arrayDest[0]["tipo"] = "to";
-		arrayDest[0]["direccion"] = emailProveedor;
 
-		var arrayAttach:Array = [];
+	var arrayDest:Array = [];
+	arrayDest[0] = [];
+	arrayDest[0]["tipo"] = "to";
+	arrayDest[0]["direccion"] = emailProveedor;
 
-		flfactppal.iface.pub_enviarCorreo(cuerpo, asunto, arrayDest, arrayAttach);
-	} else {
-	     var datosMail = [];
-	     datosMail["subject"] = asunto;
-	     datosMail["body"] = cuerpo;
-	     datosMail["from"] = AQUtil.sqlSelect("usuarios", "usuariosmtp", "idusuario='" + usuario + "'");
-	     datosMail["to"] = emailProveedor;   	
-	     var arrayAttach = [];	    
-	     datosMail["attach"] = arrayAttach;
-	     flfacturac.iface.pub_enviarMail(datosMail); 
+	var arrayAttach:Array = [];
 
-	}
+	flfactppal.iface.pub_enviarCorreo(cuerpo, asunto, arrayDest, arrayAttach);
 }
 
 function envioMail_enviarEmailPedido()
@@ -103,7 +82,7 @@ function envioMail_accesoWeb():Boolean
 
 	var nombreNavegador = util.readSettingEntry("scripts/flfactinfo/nombrenavegador");
 	if (!nombreNavegador || nombreNavegador == "") {
-		MessageBox.warning(util.translate("scripts", "No tiene establecido el nombre del navegador.\nDebe establecer este valor en la pestaña Correo del formulario de empresa"), MessageBox.Ok, MessageBox.NoButton);
+		MessageBox.warning(util.translate("scripts", "No tiene establecido el nombre del navegador.\nDebe establecer este valor en la pestaÃ±a Correo del formulario de empresa"), MessageBox.Ok, MessageBox.NoButton);
 		return false;
 	}
 
@@ -123,16 +102,6 @@ function envioMail_enviarEmailContacto()
 {
 	var cursor:FLSqlCursor = this.cursor();
 	var util:FLUtil = new FLUtil();
-	var usuario = sys.nameUser();
-	var usarSMTP;
-	
-	var clienteCorreo = AQUtil.readSettingEntry("scripts/flfactinfo/clientecorreo");
-	if (clienteCorreo == "Eneboo") {
-		usarSMTP = true;
-	}
-	else{
-		usarSMTP = AQUtil.sqlSelect("usuarios", "utilizarsmtp", "idusuario='" + usuario + "'");
-	}
 
 	var emailContacto:String = this.child("tdbContactos").cursor().valueBuffer("email");
 	if (!emailContacto || emailContacto == "") {
@@ -141,27 +110,17 @@ function envioMail_enviarEmailContacto()
 	}
 	var cuerpo:String = "";
 	var asunto:String = "";
-	if(!usarSMTP) {
-		var arrayDest:Array = [];
-		arrayDest[0] = [];
-		arrayDest[0]["tipo"] = "to";
-		arrayDest[0]["direccion"] = emailContacto;
 
-		var arrayAttach:Array = [];
+	var arrayDest:Array = [];
+	arrayDest[0] = [];
+	arrayDest[0]["tipo"] = "to";
+	arrayDest[0]["direccion"] = emailContacto;
 
-		flfactppal.iface.pub_enviarCorreo(cuerpo, asunto, arrayDest, arrayAttach);
-	} else {
+	var arrayAttach:Array = [];
 
-	     var datosMail = [];
-	     datosMail["subject"] = asunto;
-	     datosMail["body"] = cuerpo;
-	     datosMail["from"] = AQUtil.sqlSelect("usuarios", "usuariosmtp", "idusuario='" + usuario + "'");
-	     datosMail["to"] = emailContacto;   	
-	     var arrayAttach = [];	    
-	     datosMail["attach"] = arrayAttach;
-	     flfacturac.iface.pub_enviarMail(datosMail); 
-	}
+	flfactppal.iface.pub_enviarCorreo(cuerpo, asunto, arrayDest, arrayAttach);
 }
 
 //// ENVIO MAIL /////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////
+

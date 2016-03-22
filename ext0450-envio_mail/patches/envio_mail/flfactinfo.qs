@@ -2,7 +2,7 @@
 /** @class_declaration envioMail */
 /////////////////////////////////////////////////////////////////
 //// ENVIO MAIL /////////////////////////////////////////////////
-class envioMail extends oficial {
+class envioMail extends oficial /** %from: oficial */ {
 	var datosEMail:Array;
     function envioMail( context ) { oficial ( context ); }
 	function mostrarInformeVisor(visor:FLReportViewer):Boolean {
@@ -28,3 +28,4 @@ function envioMail_mostrarInformeVisor(visor:FLReportViewer):Boolean
 }
 //// ENVIO MAIL /////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////
+
